@@ -4,7 +4,7 @@ import { auth } from "../configs/FirebaseConfig";
 
 const HomeScreen = () => {
 
-console.log(`AUTH FROM Home SCREEN : ${JSON.stringify(auth)}`);
+// console.log(`AUTH FROM Home SCREEN : ${JSON.stringify(auth)}`);
 
   return (
     <View style={styles.container}>

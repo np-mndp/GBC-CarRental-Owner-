@@ -8,11 +8,16 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import axios from "axios";
 import { useForm, Controller } from "react-hook-form";
 import ImageTabs from "../components/ImageTabs";
 import { doFwdGeocode, requestLocationPermission } from "../configs/LocationService";
+import { auth, firebase, firestore } from "./../configs/FirebaseConfig";
+import FirestoreController from "../controllers/FirebaseController"; // Adjust the import path
+import { GeoPoint } from "firebase/firestore"; // Import GeoPoint from Firestore
+
 
 const AddListingScreen = () => {
   const { control, handleSubmit, setValue } = useForm();
@@ -56,30 +61,92 @@ const AddListingScreen = () => {
   }, [searchModel, models]);
 
   const onSubmit = async (data) => {
-    console.log("Location Address:", data.pickupLocation);
+    // console.log("Location Address:", data.pickupLocation);
 
     // Request location permission
     const hasPermission = await requestLocationPermission();
 
-    if (hasPermission) {
-        // Convert the address to coordinates
-        const coordinates = await doFwdGeocode(data.pickupLocation);
-        console.log("Coordinates:", coordinates);
-
-        if (coordinates) {
-            const listingData = {
-                ...data,
-                coordinates,
-            };
-            console.log("Listing Data:", listingData);
-            // Add your listing logic here
-        } else {
-            console.log("Failed to get coordinates");
-        }
-    } else {
-        console.log("Location permission not granted");
+    if (!hasPermission) {
+        Alert.alert("Location permission not granted");
+        return;
     }
+    const user = auth?.currentUser
+
+        // Create the listing data structure
+        const finalData = {
+          address: data.pickupLocation,
+          available: true,
+          city: data.city || "Toronto",
+          licensePlate: data.licensePlate,
+          ownerImg: "a", // TODO: Add logic to fetch or update the user's profile image
+          price: data.rentalPrice,
+          seats: data.seatingCapacity,
+          vehicle: data.vehicleName,
+          vehicleImg: data.photoUrl,
+          user: user.email
+      };
+
+      // console.log("Final data:", finalData)
+    // Check if any fields are missing
+  const missingFields = Object.keys(finalData).filter((key) => {
+    return finalData[key] === undefined || finalData[key] === null || finalData[key] === "";
+  });
+
+  if (missingFields.length > 0) {
+    Alert.alert("Missing Fields: All fields are required.");
+    return;
+  }
+    // Convert the address to coordinates
+    const coordinates = await doFwdGeocode(data.pickupLocation);
+    // console.log("Coordinates:", coordinates);
+
+    if (!coordinates) {
+        Alert.alert("Failed to get coordinates for the given address");
+        return;
+    }
+console.log("---------end---------")
+
+ // Use GeoPoint for coordinates
+ const listingData = {
+  ...finalData,
+  coords: new GeoPoint(coordinates.latitude, coordinates.longitude),
 };
+
+    // Add listing to Firestore
+    const firestoreController = FirestoreController.getInstance();
+    const result = await firestoreController.addListing(listingData);
+
+    if (result.success) {
+      console.log("Listing added successfully with ID:", result.id);
+      
+      // Show success alert
+      Alert.alert(
+        "Success",
+        "Listing added successfully!",
+        [{ text: "OK", onPress: () => console.log("Alert closed") }],
+        { cancelable: false }
+      );
+  
+      // Clear all fields in the form
+      setValue("pickupLocation", "");
+      setValue("licensePlate", "");
+      setValue("city", "");
+      setValue("rentalPrice", "");
+      setValue("seatingCapacity", "");
+      setValue("vehicleName", "");
+      setValue("doors", "");
+      setValue("horsepower", "");
+      setSearchMake("");
+      setSearchModel("");
+      setSelectedMake("");
+      setSelectedModel("");
+      setSelectedVehicle(null);
+  
+    } else {
+      console.error("Failed to add listing:", result.error);
+      Alert.alert("Error", "Failed to add listing. Please try again.");
+    }
+  };
 
 
   const handleMakePress = (make) => {
@@ -106,7 +173,7 @@ const AddListingScreen = () => {
 
     if (vehicle) {
       setValue("vehicleName", `${vehicle.make} ${vehicle.model} ${vehicle.trim}`);
-      setValue("seatingCapacity", `${vehicle.seats_min} seats`);
+      setValue("seatingCapacity", `${vehicle.seats_max}`);
       setValue("photoUrl", vehicle.images[0].url_full);
       setValue("doors", vehicle.doors);
       setValue("horsepower", vehicle.horsepower);
