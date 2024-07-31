@@ -9,11 +9,14 @@ const FloatingMenu = ({ navigation, setVisibility }) => {
   const logoutPressed = async () => {
     try {
       setVisibility("none");
-      await signOut(auth);
-
-      console.log(`Successfully Logged out: ${JSON.stringify(navigation)}`);
-
-      if (navigation.canGoBack()) {
+      if (auth.currentUser) {
+        await signOut(auth);
+        console.log(`Successfully Logged out: ${JSON.stringify(navigation)}`);
+        if (navigation.canGoBack()) {
+          navigation.dispatch(StackActions.popToTop());
+        }
+      } else {
+        console.log("No user logged in");
         navigation.dispatch(StackActions.popToTop());
       }
     } catch (err) {

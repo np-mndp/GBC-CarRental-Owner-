@@ -92,7 +92,7 @@ export default function App() {
                   <Ionicons name="menu-outline" color="white" size={32} />
                 </Pressable>
                 <View style={{ display: visibility }}>
-                  <FloatingMenu navigation={navigation} />
+                  <FloatingMenu navigation={navigation} setVisibility={setVisibility}/>
                 </View>
               </View>
             ),
