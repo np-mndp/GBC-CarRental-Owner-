@@ -1,6 +1,10 @@
+import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import Ionicons from "@expo/vector-icons/Ionicons";
+
+// Import your screens
 import HomeScreen from "./screens/HomeScreen";
 import AddListingScreen from "./screens/AddListingScreen";
 import ManageBookingScreen from "./screens/ManageBookings";
@@ -11,15 +15,58 @@ import FloatingMenu from "./screens/Menu/OptionsScreen";
 import { useState } from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
+// Create stack and tab navigators
 const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+
+// Define a component for the tab navigation
+function MainTabNavigator() {
+  return (
+    <Tab.Navigator
+      initialRouteName="Home"
+      screenOptions={({ route }) => ({
+        headerStyle: {
+          backgroundColor: "#aa6558",
+        },
+        headerTintColor: "#fff",
+        headerTitleStyle: {
+          fontWeight: "bold",
+        },
+        tabBarActiveTintColor: "#aa6558", // Moved from tabBarOptions
+        tabBarInactiveTintColor: "gray",  // Moved from tabBarOptions
+        tabBarStyle: {
+          display: "flex",
+        },
+        tabBarIcon: ({ color, size }) => {
+          let iconName;
+
+          if (route.name === "Home") {
+            iconName = "home";
+          } else if (route.name === "Add Listing") {
+            iconName = "add-circle";
+          } else if (route.name === "Manage Bookings") {
+            iconName = "book";
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+      })}
+    >
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Add Listing" component={AddListingScreen} />
+      <Tab.Screen name="Manage Bookings" component={ManageBookingScreen} />
+    </Tab.Navigator>
+  );
+}
+
 export default function App() {
   const [visibility, setVisibility] = useState("none");
 
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName={auth?.currentUser ? "Home" : "Login"}
-        screenOptions={() => ({
+        initialRouteName="Login"
+        screenOptions={{
           headerStyle: {
             backgroundColor: "#aa6558",
           },
@@ -27,53 +74,15 @@ export default function App() {
           headerTitleStyle: {
             fontWeight: "bold",
           },
-        })}
+        }}
       >
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={({ navigation }) => ({
-            title: "Home",
-            headerRight: () => (
-              <View>
-                <Pressable
-                  onPress={() =>
-                    visibility == "none"
-                      ? setVisibility("flex")
-                      : setVisibility("none")
-                  }
-                >
-                  <Ionicons
-                    name="menu-outline"
-                    color="white"
-                    size={32}
-                  ></Ionicons>
-                </Pressable>
-                <View style={{ display: visibility }}>
-                  <FloatingMenu navigation={navigation} />
-                </View>
-              </View>
-            ),
-            headerTintColor: "#fff",
-            headerTitleStyle: {
-              fontWeight: "bold",
-            },
-          })}
+          name="Main"
+          component={MainTabNavigator}
+          options={{ headerShown: false }} // Hide the header for the tab navigator
         />
-        <Stack.Screen name="Add Listing" component={AddListingScreen} />
-        <Stack.Screen name="Manage Bookings" component={ManageBookingScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
-//checking push access

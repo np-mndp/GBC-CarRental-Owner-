@@ -8,20 +8,22 @@ const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("owner@gmail.com");
   const [password, setPassword] = useState("owner12345");
   const [error, setError] = useState(null);
-
   const [loading, setLoading] = useState(false);
 
   const onLoginPressed = async () => {
     if (!(email.length >= 7) || !(password.length >= 8)) {
-      setError("Please enter valid email and password");
-    }
-    setLoading(true);
-    const firestoreController = FirestoreController.getInstance();
-    const result = await firestoreController.login(email, password);
-    if (result.success) {
-      setLoading(false);
-      console.log(`AUTH FROM LOGIN SCREEN : ${JSON.stringify(console.log(`AUTH FROM LOGIN SCREEN : ${auth}`))}`);
-      navigation.navigate("Home");
+      setError("Please enter a valid email and password");
+    } else {
+      setLoading(true);
+      const firestoreController = FirestoreController.getInstance();
+      const result = await firestoreController.login(email, password);
+      if (result.success) {
+        setLoading(false);
+        navigation.replace("Main"); // Navigate to the Main tab navigator
+      } else {
+        setLoading(false);
+        setError("Login failed. Please try again.");
+      }
     }
   };
 
@@ -36,6 +38,7 @@ const LoginScreen = ({ navigation }) => {
         }}
         value={email}
         placeholder="email@mail.com"
+        keyboardType="email-address" // Use keyboardType for email input
       />
 
       <TextInput
@@ -45,8 +48,7 @@ const LoginScreen = ({ navigation }) => {
           setPassword(passwordInput);
         }}
         value={password}
-        inputMode="email"
-        secureTextEntry={true}
+        secureTextEntry={true} // Corrected to boolean
         placeholder="Password"
       />
 
@@ -65,7 +67,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    // backgroundColor: "#F5FCFF",
   },
   input: {
     height: 40,
