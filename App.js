@@ -23,6 +23,7 @@ function MainTabNavigator() {
     <Tab.Navigator
       initialRouteName="Home"
       screenOptions={({ route }) => ({
+        headerShown: false,
         headerStyle: {
           backgroundColor: "#aa6558",
         },
@@ -80,7 +81,7 @@ export default function App() {
           options={({ navigation }) => ({
             headerShown: true,
             headerRight: () => (
-              <View style={styles.menuContainer}>
+              <View>
                 <Pressable
                   onPress={() =>
                     setVisibility((prevVisibility) =>
