@@ -3,7 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { signOut } from "firebase/auth";
 import { auth } from "../../configs/FirebaseConfig";
-import { StackActions } from "@react-navigation/native";
+import { CommonActions } from "@react-navigation/native";
 
 const FloatingMenu = ({ navigation, setVisibility }) => {
   const logoutPressed = async () => {
@@ -11,20 +11,31 @@ const FloatingMenu = ({ navigation, setVisibility }) => {
       setVisibility("none");
       if (auth.currentUser) {
         await signOut(auth);
-        console.log(`Successfully Logged out: ${JSON.stringify(navigation)}`);
-        if (navigation.canGoBack()) {
-          navigation.dispatch(StackActions.popToTop());
-        }
+        console.log("Successfully logged out");
+
+        // Reset navigation stack to Login screen
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "Login" }],
+          })
+        );
       } else {
         console.log("No user logged in");
-        if (navigation.canGoBack()) {
-            navigation.dispatch(StackActions.popToTop());
-          }
+
+        // Reset navigation stack to Login screen
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "Login" }],
+          })
+        );
       }
     } catch (err) {
-      console.log(`Error while signing out : ${err}`);
+      console.log(`Error while signing out: ${err}`);
     }
   };
+
   return (
     <View style={styles.container}>
       <View
@@ -74,7 +85,6 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
   },
   profileIcon: {
-    // justifyContent:"flex-start",
     width: 50,
     height: 50,
     borderRadius: 25,
@@ -92,7 +102,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
-    shadowColor: "#e4c3bd",
   },
   buttonText: {
     color: "#fff",

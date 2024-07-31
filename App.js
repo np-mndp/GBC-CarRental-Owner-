@@ -3,39 +3,27 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "@expo/vector-icons/Ionicons";
-
-// Import your screens
+import { Pressable, View } from "react-native";
+import FloatingMenu from "./screens/Menu/OptionsScreen";
 import HomeScreen from "./screens/HomeScreen";
 import AddListingScreen from "./screens/AddListingScreen";
 import ManageBookingScreen from "./screens/ManageBookings";
 import LoginScreen from "./screens/LoginScreen";
 import { auth } from "./configs/FirebaseConfig";
-import { Pressable, View } from "react-native";
-import FloatingMenu from "./screens/Menu/OptionsScreen";
 
 // Create stack and tab navigators
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
 // Define a component for the tab navigation
-function MainTabNavigator() {
+function MainTabNavigator({ navigation }) {
   return (
     <Tab.Navigator
       initialRouteName="Home"
       screenOptions={({ route }) => ({
         headerShown: false,
-        headerStyle: {
-          backgroundColor: "#aa6558",
-        },
-        headerTintColor: "#fff",
-        headerTitleStyle: {
-          fontWeight: "bold",
-        },
-        tabBarActiveTintColor: "#aa6558", // Moved from tabBarOptions
-        tabBarInactiveTintColor: "gray", // Moved from tabBarOptions
-        tabBarStyle: {
-          display: "flex",
-        },
+        tabBarActiveTintColor: "#aa6558",
+        tabBarInactiveTintColor: "gray",
         tabBarIcon: ({ color, size }) => {
           let iconName;
 
@@ -60,10 +48,11 @@ function MainTabNavigator() {
 
 export default function App() {
   const [visibility, setVisibility] = useState("none");
+
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName={auth?.currentUser ? "Home" : "Login"}
+        initialRouteName={auth?.currentUser ? "Main" : "Login"}
         screenOptions={{
           headerStyle: {
             backgroundColor: "#aa6558",
@@ -92,7 +81,7 @@ export default function App() {
                   <Ionicons name="menu-outline" color="white" size={32} />
                 </Pressable>
                 <View style={{ display: visibility }}>
-                  <FloatingMenu navigation={navigation} setVisibility={setVisibility}/>
+                  <FloatingMenu navigation={navigation} setVisibility={setVisibility} />
                 </View>
               </View>
             ),
