@@ -33,7 +33,7 @@ function MainTabNavigator() {
           fontWeight: "bold",
         },
         tabBarActiveTintColor: "#aa6558", // Moved from tabBarOptions
-        tabBarInactiveTintColor: "gray",  // Moved from tabBarOptions
+        tabBarInactiveTintColor: "gray", // Moved from tabBarOptions
         tabBarStyle: {
           display: "flex",
         },
@@ -78,9 +78,38 @@ export default function App() {
       >
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen
-          name="Main"
-          component={MainTabNavigator}
-          options={{ headerShown: false }} // Hide the header for the tab navigator
+          name="Home"
+          component={HomeScreen}
+          options={({ navigation }) => ({
+            title: "Home",
+            headerRight: () => (
+              <View>
+                <Pressable
+                  onPress={() =>
+                    visibility == "none"
+                      ? setVisibility("flex")
+                      : setVisibility("none")
+                  }
+                >
+                  <Ionicons
+                    name="menu-outline"
+                    color="white"
+                    size={32}
+                  ></Ionicons>
+                </Pressable>
+                <View style={{ display: visibility }}>
+                  <FloatingMenu
+                    navigation={navigation}
+                    setVisibility={setVisibility}
+                  />
+                </View>
+              </View>
+            ),
+            headerTintColor: "#fff",
+            headerTitleStyle: {
+              fontWeight: "bold",
+            },
+          })}
         />
       </Stack.Navigator>
     </NavigationContainer>
