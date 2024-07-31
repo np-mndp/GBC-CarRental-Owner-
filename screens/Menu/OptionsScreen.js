@@ -5,9 +5,10 @@ import { signOut } from "firebase/auth";
 import { auth } from "../../configs/FirebaseConfig";
 import { StackActions } from "@react-navigation/native";
 
-const FloatingMenu = ({ navigation }) => {
+const FloatingMenu = ({ navigation, setVisibility }) => {
   const logoutPressed = async () => {
     try {
+      setVisibility("none");
       await signOut(auth);
 
       console.log(`Successfully Logged out: ${JSON.stringify(navigation)}`);

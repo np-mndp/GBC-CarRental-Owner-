@@ -51,7 +51,10 @@ export default function App() {
                   ></Ionicons>
                 </Pressable>
                 <View style={{ display: visibility }}>
-                  <FloatingMenu navigation={navigation} />
+                  <FloatingMenu
+                    navigation={navigation}
+                    setVisibility={setVisibility}
+                  />
                 </View>
               </View>
             ),
