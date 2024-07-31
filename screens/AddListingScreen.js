@@ -12,6 +12,7 @@ import {
 import axios from "axios";
 import { useForm, Controller } from "react-hook-form";
 import ImageTabs from "../components/ImageTabs";
+import { doFwdGeocode, requestLocationPermission } from "../configs/LocationService";
 
 const AddListingScreen = () => {
   const { control, handleSubmit, setValue } = useForm();
@@ -54,10 +55,32 @@ const AddListingScreen = () => {
     setFilteredModels(filtered);
   }, [searchModel, models]);
 
-  const onSubmit = (data) => {
-    console.log("Form data:", data);
-    // Handle form submission here
-  };
+  const onSubmit = async (data) => {
+    console.log("Location Address:", data.pickupLocation);
+
+    // Request location permission
+    const hasPermission = await requestLocationPermission();
+
+    if (hasPermission) {
+        // Convert the address to coordinates
+        const coordinates = await doFwdGeocode(data.pickupLocation);
+        console.log("Coordinates:", coordinates);
+
+        if (coordinates) {
+            const listingData = {
+                ...data,
+                coordinates,
+            };
+            console.log("Listing Data:", listingData);
+            // Add your listing logic here
+        } else {
+            console.log("Failed to get coordinates");
+        }
+    } else {
+        console.log("Location permission not granted");
+    }
+};
+
 
   const handleMakePress = (make) => {
     setSelectedMake(make);
