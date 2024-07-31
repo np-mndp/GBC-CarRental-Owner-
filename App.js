@@ -9,11 +9,6 @@ import HomeScreen from "./screens/HomeScreen";
 import AddListingScreen from "./screens/AddListingScreen";
 import ManageBookingScreen from "./screens/ManageBookings";
 import LoginScreen from "./screens/LoginScreen";
-import { signOut } from "firebase/auth";
-import { auth } from "./configs/FirebaseConfig";
-import FloatingMenu from "./screens/Menu/OptionsScreen";
-import { useState } from "react";
-import Ionicons from "@expo/vector-icons/Ionicons";
 
 // Create stack and tab navigators
 const Stack = createStackNavigator();
@@ -33,7 +28,7 @@ function MainTabNavigator() {
           fontWeight: "bold",
         },
         tabBarActiveTintColor: "#aa6558", // Moved from tabBarOptions
-        tabBarInactiveTintColor: "gray", // Moved from tabBarOptions
+        tabBarInactiveTintColor: "gray",  // Moved from tabBarOptions
         tabBarStyle: {
           display: "flex",
         },
@@ -60,8 +55,6 @@ function MainTabNavigator() {
 }
 
 export default function App() {
-  const [visibility, setVisibility] = useState("none");
-
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -78,38 +71,9 @@ export default function App() {
       >
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={({ navigation }) => ({
-            title: "Home",
-            headerRight: () => (
-              <View>
-                <Pressable
-                  onPress={() =>
-                    visibility == "none"
-                      ? setVisibility("flex")
-                      : setVisibility("none")
-                  }
-                >
-                  <Ionicons
-                    name="menu-outline"
-                    color="white"
-                    size={32}
-                  ></Ionicons>
-                </Pressable>
-                <View style={{ display: visibility }}>
-                  <FloatingMenu
-                    navigation={navigation}
-                    setVisibility={setVisibility}
-                  />
-                </View>
-              </View>
-            ),
-            headerTintColor: "#fff",
-            headerTitleStyle: {
-              fontWeight: "bold",
-            },
-          })}
+          name="Main"
+          component={MainTabNavigator}
+          options={{ headerShown: false }} // Hide the header for the tab navigator
         />
       </Stack.Navigator>
     </NavigationContainer>
