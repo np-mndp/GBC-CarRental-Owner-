@@ -1,18 +1,65 @@
+import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { StyleSheet, Text, View } from "react-native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import Ionicons from "@expo/vector-icons/Ionicons";
+
+// Import your screens
 import HomeScreen from "./screens/HomeScreen";
 import AddListingScreen from "./screens/AddListingScreen";
 import ManageBookingScreen from "./screens/ManageBookings";
 import LoginScreen from "./screens/LoginScreen";
 
+// Create stack and tab navigators
 const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
+
+// Define a component for the tab navigation
+function MainTabNavigator() {
+  return (
+    <Tab.Navigator
+      initialRouteName="Home"
+      screenOptions={({ route }) => ({
+        headerStyle: {
+          backgroundColor: "#aa6558",
+        },
+        headerTintColor: "#fff",
+        headerTitleStyle: {
+          fontWeight: "bold",
+        },
+        tabBarActiveTintColor: "#aa6558", // Moved from tabBarOptions
+        tabBarInactiveTintColor: "gray",  // Moved from tabBarOptions
+        tabBarStyle: {
+          display: "flex",
+        },
+        tabBarIcon: ({ color, size }) => {
+          let iconName;
+
+          if (route.name === "Home") {
+            iconName = "home";
+          } else if (route.name === "Add Listing") {
+            iconName = "add-circle";
+          } else if (route.name === "Manage Bookings") {
+            iconName = "book";
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+      })}
+    >
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Add Listing" component={AddListingScreen} />
+      <Tab.Screen name="Manage Bookings" component={ManageBookingScreen} />
+    </Tab.Navigator>
+  );
+}
+
 export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator
         initialRouteName="Login"
-        screenOptions={() => ({
+        screenOptions={{
           headerStyle: {
             backgroundColor: "#aa6558",
           },
@@ -20,23 +67,15 @@ export default function App() {
           headerTitleStyle: {
             fontWeight: "bold",
           },
-        })}
+        }}
       >
         <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="Add Listing" component={AddListingScreen} />
-        <Stack.Screen name="Manage Bookings" component={ManageBookingScreen} />
+        <Stack.Screen
+          name="Main"
+          component={MainTabNavigator}
+          options={{ headerShown: false }} // Hide the header for the tab navigator
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
-//checking push access
