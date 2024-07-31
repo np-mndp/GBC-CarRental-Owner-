@@ -31,7 +31,7 @@ class FirestoreController {
 
   //************* Methods *************/
 
-  login = async (email, password, setLoading) => {
+  login = async (email, password) => {
     try {
       const userCredentials = await signInWithEmailAndPassword(
         auth,

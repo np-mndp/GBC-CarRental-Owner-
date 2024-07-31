@@ -5,15 +5,21 @@ import { signOut } from "firebase/auth";
 import { auth } from "../../configs/FirebaseConfig";
 import { StackActions } from "@react-navigation/native";
 
-const FloatingMenu = ({ navigation }) => {
+const FloatingMenu = ({ navigation, setVisibility }) => {
   const logoutPressed = async () => {
     try {
-      await signOut(auth);
-
-      console.log(`Successfully Logged out: ${JSON.stringify(navigation)}`);
-
-      if (navigation.canGoBack()) {
-        navigation.dispatch(StackActions.popToTop());
+      setVisibility("none");
+      if (auth.currentUser) {
+        await signOut(auth);
+        console.log(`Successfully Logged out: ${JSON.stringify(navigation)}`);
+        if (navigation.canGoBack()) {
+          navigation.dispatch(StackActions.popToTop());
+        }
+      } else {
+        console.log("No user logged in");
+        if (navigation.canGoBack()) {
+            navigation.dispatch(StackActions.popToTop());
+          }
       }
     } catch (err) {
       console.log(`Error while signing out : ${err}`);
