@@ -2,26 +2,23 @@ import { useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import FirestoreController from "../controllers/FirebaseController";
-import { auth } from "../configs/FirebaseConfig";
+import { useNavigation } from "@react-navigation/native";
 
-const LoginScreen = ({ navigation }) => {
+const LoginScreen = () => {
+  const navigation = useNavigation()
   const [email, setEmail] = useState("owner@gmail.com");
   const [password, setPassword] = useState("owner12345");
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
 
   const onLoginPressed = async () => {
     if (!(email.length >= 7) || !(password.length >= 8)) {
       setError("Please enter a valid email and password");
     } else {
-      setLoading(true);
       const firestoreController = FirestoreController.getInstance();
       const result = await firestoreController.login(email, password);
       if (result.success) {
-        setLoading(false);
         navigation.replace("Main"); // Navigate to the Main tab navigator
       } else {
-        setLoading(false);
         setError("Login failed. Please try again.");
       }
     }

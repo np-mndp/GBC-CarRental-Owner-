@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,20 +8,48 @@ import {
   ActivityIndicator,
 } from "react-native";
 import FirestoreController from "../controllers/FirebaseController";
+import { auth } from "../configs/FirebaseConfig";
+import { useFocusEffect } from "@react-navigation/native";
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
   const [listings, setListings] = useState();
 
   const [loading, setLoading] = useState(false);
 
-  useEffect(async () => {
-    setLoading(true);
-    const firestore = FirestoreController.getInstance();
-    const dbData = await firestore.getListings();
-    setListings(dbData);
-    console.log(`LOSTINGSSSSSSSSSSSSSSSSSS: ${JSON.stringify(listings)}`);
-    setLoading(false);
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      const fetchData = async () => {
+        setLoading(true);
+        const firestore = FirestoreController.getInstance();
+        const dbData = await firestore.getListings();
+        setListings(dbData);
+        console.log(`Listings: ${JSON.stringify(listings)}`);
+        setLoading(false);
+      };
+
+      fetchData();
+
+      return () => {
+        // Clean up if needed
+      };
+    }, [])
+  );
+
+  // useEffect(() => {
+  //   if (auth.currentUser == null) {
+  //     navigation.navigate("Login");
+  //   }
+  //   const fetchData = async () => {
+  //     setLoading(true);
+  //     const firestore = FirestoreController.getInstance();
+  //     const dbData = await firestore.getListings();
+  //     setListings(dbData);
+  //     console.log(`Listings: ${JSON.stringify(listings)}`);
+  //     setLoading(false);
+  //   };
+
+  //   fetchData();
+  // }, []);
 
   const renderItem = ({ item }) => (
     <View style={styles.itemContainer}>
@@ -30,7 +58,9 @@ const HomeScreen = () => {
         <Text style={styles.title}>{item.vehicle}</Text>
         <Text style={styles.text}>{`Address: ${item.address}`}</Text>
         <Text style={styles.text}>{`City: ${item.city}`}</Text>
-        <Text style={styles.text}>{`Coords: ${item.coords}`}</Text>
+        <Text
+          style={styles.text}
+        >{`Coordinates: ${item.coords.latitude}N, ${item.coords.longitude}W`}</Text>
         <Text style={styles.text}>{`License Plate: ${item.licensePlate}`}</Text>
         <Text style={styles.text}>{`Price: $${item.price}`}</Text>
         <Text style={styles.text}>{`Seats: ${item.seats}`}</Text>
@@ -40,7 +70,6 @@ const HomeScreen = () => {
       </View>
     </View>
   );
-
 
   return (
     <View style={styles.container}>

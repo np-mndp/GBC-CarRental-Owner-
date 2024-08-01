@@ -27,7 +27,7 @@ function MainTabNavigator({ navigation }) {
         tabBarIcon: ({ color, size }) => {
           let iconName;
 
-          if (route.name === "Home") {
+          if (route.name === "My Listings") {
             iconName = "home";
           } else if (route.name === "Add Listing") {
             iconName = "add-circle";
@@ -39,7 +39,7 @@ function MainTabNavigator({ navigation }) {
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="My Listings" component={HomeScreen} />
       <Tab.Screen name="Add Listing" component={AddListingScreen} />
       <Tab.Screen name="Manage Bookings" component={ManageBookingScreen} />
     </Tab.Navigator>
