@@ -4,11 +4,11 @@ import {
   addDoc,
   deleteDoc,
   doc,
-
   GeoPoint,
   query,
   where,
   getDoc,
+  setDoc,
 } from "firebase/firestore";
 import { auth, db } from "../configs/FirebaseConfig";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -144,6 +144,41 @@ class FirestoreController {
     }
   };
 
+  approveBooking = async (listingId, bookingId) => {
+    try {
+      const r = (Math.random() + 1).toString(36).substring(2);
+      const coll = collection(db, "Listing/" + listingId + "/bookings");
+      const docRef = doc(coll, bookingId);
+
+      console.log({ r });
+
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        console.log("Document exists");
+        await setDoc(
+          docRef,
+          {
+            status: "Approved",
+            confirmationCode: r,
+          },
+          { merge: true }
+        ).then(() => {
+          console.log("Document updated successfully");
+          return {
+            status: "success",
+            code: r,
+          };
+        });
+        return {
+            status: "success",
+            code: r,
+          };
+      } else {
+        console.log("Document does not exist");
+      }
+    } catch (error) {}
+  };
+
   //add video to favorites
   addToFavorites = async (video) => {
     try {
@@ -172,18 +207,17 @@ class FirestoreController {
     }
   };
 
-
-// Add listing to Firestore
-addListing = async (listingData) => {
-  try {
-    const docRef = await addDoc(collection(db, "Listing"), listingData);
-    console.log("Listing added with ID: ", docRef.id);
-    return { success: true, id: docRef.id };
-  } catch (error) {
-    console.error("Error adding listing: ", error);
-    return { success: false, error };
-  }
-};
+  // Add listing to Firestore
+  addListing = async (listingData) => {
+    try {
+      const docRef = await addDoc(collection(db, "Listing"), listingData);
+      console.log("Listing added with ID: ", docRef.id);
+      return { success: true, id: docRef.id };
+    } catch (error) {
+      console.error("Error adding listing: ", error);
+      return { success: false, error };
+    }
+  };
 }
 
 export default FirestoreController;
