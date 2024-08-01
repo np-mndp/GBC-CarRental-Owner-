@@ -4,6 +4,8 @@ import {
   addDoc,
   deleteDoc,
   doc,
+
+  GeoPoint,
   query,
   where,
   getDoc,
@@ -170,25 +172,18 @@ class FirestoreController {
     }
   };
 
-  //clear all favorite videos
-  clearFavorites = async () => {
-    try {
-      const favoritesRef = collection(db, "favorites");
-      const querySnapshot = await getDocs(favoritesRef);
 
-      const deletePromises = querySnapshot.docs.map((docSnapshot) => {
-        const docRef = doc(db, "favorites", docSnapshot.id);
-        return deleteDoc(docRef);
-      });
-
-      await Promise.all(deletePromises);
-      console.log("All favorite videos cleared.");
-      return { success: true };
-    } catch (error) {
-      console.error("Error clearing favorites:", error);
-      return { success: false, error };
-    }
-  };
+// Add listing to Firestore
+addListing = async (listingData) => {
+  try {
+    const docRef = await addDoc(collection(db, "Listing"), listingData);
+    console.log("Listing added with ID: ", docRef.id);
+    return { success: true, id: docRef.id };
+  } catch (error) {
+    console.error("Error adding listing: ", error);
+    return { success: false, error };
+  }
+};
 }
 
 export default FirestoreController;
